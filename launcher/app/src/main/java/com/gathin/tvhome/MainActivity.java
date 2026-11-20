@@ -122,6 +122,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private boolean homeIgnoreChannelKeys;
     /** Launcher settings' change count this Home was built with (see onResume). */
     private long settingsRevision;
+    /** wallpaper.jpg as this Home read it (modified time and size); onResume rebuilds when an add-on replaces it. */
+    private long wallpaperStamp;
     /** Idle time on Home before ClockActivity; 0 is off (config.xml, home_idle_clock_minutes). */
     private long idleClockMs;
     /** Back on Home opens ClockActivity (config.xml, back_opens_clock). */
@@ -472,6 +474,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         // off the list (needs WRITE_SECURE_SETTINGS, granted by build-and-install with RESTORE_KEY_SERVICES=1).
         if (cfg.restoreKeyServices) ServiceRepair.restore(this);
         settingsRevision = settingsRevision();
+        wallpaperStamp = wallpaperStamp();
         applyViewInputsHandler(cfg.handleViewInputs);
         settingsKeycodes = cfg.settingsKeycodes;
         settingsKeyPanel = cfg.settingsKeyPanel;
@@ -1103,6 +1106,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             recreate();
             return;
         }
+        if (wallpaperStamp != wallpaperStamp()) {
+            recreate();
+            return;
+        }
         restartIdleClock();
         promptsPaused = false;
         if (grid.getAdapter() == null) grid.setAdapter(adapter);   // dropped by onTrimMemory
@@ -1149,6 +1156,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 handler.postDelayed(this::playPetalShower, 450);
             }
         }
+    }
+
+    private long wallpaperStamp() {
+        File dir = Config.dir(this);
+        File wallpaper = dir == null ? null : new File(dir, Config.WALLPAPER_NAME);
+        return wallpaper == null ? 0 : wallpaper.lastModified() * 31 + wallpaper.length();
     }
 
     /** Launcher settings' change count (Config.SETTINGS_REVISION_KEY); onResume rebuilds Home when it moved. */
