@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher tile, 320x180: a touchpad with a pointer arrow. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+    <path android:fillColor="#FF0E1A2B" android:pathData="M0,0h320v180h-320z" />
+    <path android:fillColor="#FF1C3350" android:pathData="M96,36 h128 a12,12 0 0 1 12,12 v84 a12,12 0 0 1 -12,12 h-128 a12,12 0 0 1 -12,-12 v-84 a12,12 0 0 1 12,-12z" />
+    <path android:fillColor="#FF2F5E92" android:pathData="M104,44 h112 a6,6 0 0 1 6,6 v80 a6,6 0 0 1 -6,6 h-112 a6,6 0 0 1 -6,-6 v-80 a6,6 0 0 1 6,-6z" />
+    <path android:fillColor="#FFFFFFFF" android:strokeColor="#FF000000" android:strokeWidth="2"
+        android:pathData="M150,64 L150,112 L162,102 L170,120 L178,116 L170,98 L186,98 z" />
+</vector>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- The server that serves the control page and takes its commands. Only the home network, this device and Tailscale
+         can connect: NetPolicy drops everyone else before reading a byte. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Lets the on/off switch for the accessibility service work from the app on the TV. Ordinary apps are not given it;
+         the adb shell can grant it once: pm grant tv.webremote android.permission.WRITE_SECURE_SETTINGS. Without it the
+         switch is a button that opens the system's accessibility settings instead. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <!-- Listening to the TV's sound (an option, off by default). Granted once with adb:
+         pm grant tv.webremote android.permission.RECORD_AUDIO. Only the sound other apps play is captured, never a microphone. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Screen sharing: Android needs a foreground service of this type for as long as the screen is being captured. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
+    <!-- Which apps there are to list in the page. -->
+    <queries>
+        <package android:name="com.tailscale.ipn" />
+        <package android:name="com.xiaomi.mitv.tvmanager" />
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@drawable/banner"
+        android:banner="@drawable/banner"
+        android:theme="@android:style/Theme.DeviceDefault"
+        android:allowBackup="false"
+        android:supportsRtl="true">
+
+        <!-- Draws the pointer and taps, swipes, types and sends keys for a paired device. Turn it on in
+             Settings > Accessibility, or from a computer with ADB (see install.sh). -->
+        <service
+            android:name=".RemoteService"
+            android:label="@string/app_name"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service" />
+        </service>
+
+        <service
+            android:name=".CaptureService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
